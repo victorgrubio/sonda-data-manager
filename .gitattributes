@@ -1,0 +1,2 @@
+tests/data/playlist.mvs filter=lfs diff=lfs merge=lfs -text
+tests/data/sample_video_15s_1080p_30fps_1.mkv filter=lfs diff=lfs merge=lfs -text

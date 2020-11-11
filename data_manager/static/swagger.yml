@@ -1,0 +1,1484 @@
+info:
+    description: 'This is a Data Manager serer for video quality analysis. The development of this service is provided by GATV, a research group from the Technical University of Madrid.'
+    termsOfService: 'http://swagger.io/terms/'
+    contact:
+      email: dmz@gatv.ssr.upm.es
+    license:
+      name: Apache 2.0
+      url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+    title: Swagger Video Analysis
+    version: 1.0.0
+  host: 'sonda:5001'
+  basePath: /
+  tags:
+    - name: documents
+      description: Measures of MOS
+    - name: journeys
+      description: Journey related methods
+    - name: programs
+      description: Program related methods
+    - name: search
+      description: Search methods
+    - name: vod
+      description: VoD methods
+    - name: videoqualityprobe
+      description: MOS probe management
+    - name: database
+      description: Database management
+    - name: others
+      description: Additional methods with non-specific category
+  paths:
+    /videoAnalysis/updateFrame:
+      get:
+        tags:
+          - others
+        summary: Gets thumbnail frame
+        description: Updates thumbnail frame from current video/stream
+        operationId: update_frame
+        parameters:
+          - name: api_key
+            in: header
+            required: false
+            schema:
+              type: string
+        responses:
+          '200':
+            description: Updated frame succesfully
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ApiResponse'
+          default:
+            description: Unexpected server response
+            content:
+              application/json: ErrorResponse
+        security:
+          - api_key: null
+    '/videoAnalysis/files/{filename}':
+      get:
+        tags:
+          - files
+        summary: Gets a file by its URL
+        description: Returns the file correspondent to the specified URL
+        operationId: get_file_by_filename
+        parameters:
+          - name: api_key
+            in: header
+            required: false
+            schema:
+              type: string
+          - name: filename
+            in: path
+            required: true
+            schema:
+              type: string
+        responses:
+          '200':
+            description: File requested
+            content:
+              application/json:
+                schema:
+                  type: file
+          '404':
+            description: File not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          default:
+            description: Unexpected server response
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+        security:
+          - api_key: null
+    /videoAnalysis/db/import:
+      post:
+        tags:
+          - database
+        summary: Imports DB from GZIP
+        description: Imports DB from GZIP
+        operationId: import_db
+        parameters:
+          - name: api_key
+            in: header
+            required: false
+            schema:
+              type: string
+          - name: file
+            in: formData
+            description: DB in GZIP file with valid schema
+            required: true
+            schema:
+              type: file
+        responses:
+          '200':
+            description: DB imported successfully
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ApiResponse'
+          '405':
+            description: Invalid input
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          default:
+            description: Unexpected server response
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+        security:
+          - api_key: null
+    /videoAnalysis/db/export:
+      get:
+        tags:
+          - database
+        summary: Export DB to GZIP
+        description: Export complete DB to GZIP file
+        operationId: export_db
+        parameters:
+          - name: api_key
+            in: header
+            required: false
+            schema:
+              type: string
+        responses:
+          '200':
+            description: DB as GZIP
+            content:
+              application/json:
+                schema:
+                  type: file
+          '404':
+            description: Empty DB
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          default:
+            description: Unexpected server response
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+        security:
+          - api_key: null
+    /videoAnalysis/probe/launch:
+      post:
+        tags:
+          - videoqualityprobe
+        summary: Launchs Video Quality Probe
+        description: Video Quality Probe starts analyzing video
+        operationId: launch_videoqualityprobe
+        parameters:
+          - name: api_key
+            in: header
+            required: false
+            schema:
+              type: string
+        responses:
+          '200':
+            description: Video Quality Probe launched successfully
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ApiResponse'
+          '404':
+            description: VideoQualityProbe config not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          default:
+            description: Unexpected server response
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+        security:
+          - api_key: null
+    /videoAnalysis/probe/stop:
+      post:
+        tags:
+          - videoqualityprobe
+        summary: Stops Video Quality Probe
+        description: Video Quality Probe stops analyzing video
+        operationId: stop_videoqualityprobe
+        parameters:
+          - name: api_key
+            in: header
+            required: false
+            schema:
+              type: string
+        responses:
+          '200':
+            description: Video Quality Probe stopped successfully
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ApiResponse'
+          '404':
+            description: VideoQualityProbe not started yet
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          default:
+            description: Unexpected server response
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+        security:
+          - api_key: null
+    /videoAnalysis/probe/status:
+      get:
+        tags:
+          - videoqualityprobe
+        summary: Gets current status of probe
+        description: Gets current status of videoqualityprobe
+        operationId: get_status_videoqualityprobe
+        parameters:
+          - name: api_key
+            in: header
+            required: false
+            schema:
+              type: string
+        responses:
+          '200':
+            description: Status of videoqualityprobe
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                      enum:
+                        - idle
+                        - stopped
+                        - running
+                  example:
+                    status: running
+          default:
+            description: Unexpected server response
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+        security:
+          - api_key: null
+    /videoAnalysis/probe/config:
+      get:
+        tags:
+          - videoqualityprobe
+        summary: Gets config of VideoQualityProbe
+        description: Gets the current configuration of the VideoQualityProbe
+        operationId: get_config_videoqualityprobe
+        parameters:
+          - name: api_key
+            in: header
+            required: false
+            schema:
+              type: string
+        responses:
+          '200':
+            description: Configuration of Video Quality Probe
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ProbeConfigSchema'
+          '404':
+            description: Config not found on server
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          default:
+            description: Unexpected server response
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+        security:
+          - api_key: null
+      put:
+        tags:
+          - videoqualityprobe
+        summary: Put new config for probe
+        description: Updates current config
+        operationId: put_config_videoqualityprobe
+        requestBody:
+          description: Config for videoqualityprobe
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProbeConfigSchema'
+        parameters:
+          - name: api_key
+            in: header
+            required: false
+            schema:
+              type: string
+        responses:
+          '200':
+            description: Config updated successfully
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ApiResponse'
+          default:
+            description: Unexpected server response
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+        security:
+          - api_key: null
+    /videoAnalysis/documents/bulk:
+      post:
+        tags:
+          - documents
+        summary: Add a new document to the database
+        description: Add new document from probe to MongoDB
+        operationId: bulk_document
+        parameters:
+          - name: api_key
+            in: header
+            required: false
+            schema:
+              type: string
+          - name: mode
+            in: header
+            description: Working mode
+            required: true
+            schema:
+              type: string
+        requestBody:
+          description: Document from probe
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VideoAnalysisSchema'
+        responses:
+          '200':
+            description: successful operation
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ApiResponse'
+          '405':
+            description: Invalid input
+            schema:
+              $ref: '#/components/schemas/ErrorResponse'
+          default:
+            description: Unexpected server response
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+        security:
+          - api_key: null
+    /videoAnalysis/documents/last:
+      get:
+        tags:
+          - documents
+        summary: Gets last measure
+        description: Gets last measure from DB
+        operationId: get_last_document
+        parameters:
+          - name: api_key
+            in: header
+            required: false
+            schema:
+              type: string
+        responses:
+          '200':
+            description: Last document in DB
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/VideoAnalysisSchema'
+          '404':
+            description: Empty database
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          default:
+            description: Unexpected server response
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+        security:
+          - api_key: null
+    '/videoAnalysis/journeys/{journey_datetime}/mos':
+      get:
+        tags:
+          - journeys
+        summary: Gets average mos of a specific journey
+        description: Returns the average mos of a specific journey
+        operationId: get_journey_mos
+        parameters:
+          - name: journey_datetime
+            in: path
+            required: true
+            schema:
+              oneOf:
+                - type: string
+                  example: current
+                  enum:
+                    - current
+                    - previous
+                - type: date-time
+        responses:
+          '200':
+            description: Mos value of journey
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/MosSchema'
+          '404':
+            description: Journey not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          default:
+            description: Unexpected server response
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+        security:
+          - api_key: null
+    /videoAnalysis/journeys/date-list:
+      get:
+        tags:
+          - journeys
+        summary: Gets list of journey datetimes
+        description: Returns the list of journey datetimes
+        operationId: get_journeys_date_list
+        responses:
+          '200':
+            description: List of journeys start datetimes
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    type: date-time
+          '404':
+            description: No journeys in DB
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          default:
+            description: Unexpected server response
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+        security:
+          - api_key: null
+    '/videoAnalysis/journeys/{journey_datetime}/mos-percentages':
+      get:
+        tags:
+          - journeys
+        summary: Gets mos percetanges from a journey
+        description: Returns the percetanges of mos categories from a journey
+        operationId: get_journey_mos_percetanges
+        parameters:
+          - name: journey_datetime
+            in: path
+            required: true
+            schema:
+              oneOf:
+                - type: string
+                  example: current
+                  enum:
+                    - current
+                    - previous
+                - type: date-time
+        responses:
+          '200':
+            description: Mos categories of journey
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/MosPercentagesSchema'
+          '404':
+            description: Journey not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          default:
+            description: Unexpected server response
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+        security:
+          - api_key: null
+    '/videoAnalysis/journeys/{journey_datetime}/alert-number':
+      get:
+        tags:
+          - journeys
+        summary: Gets number of alerts/warnings in journey
+        description: Returns the number of alerts/warnings in a concretejourney
+        operationId: get_journey_alert_number
+        parameters:
+          - name: journey_datetime
+            in: path
+            required: true
+            schema:
+              oneOf:
+                - type: string
+                  example: current
+                  enum:
+                    - current
+                    - previous
+                - type: date-time
+        responses:
+          '200':
+            description: Alert categories with count
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/AlertNumberSchema'
+          '404':
+            description: Journey not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          default:
+            description: Unexpected server response
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+        security:
+          - api_key: null
+    '/videoAnalysis/journeys/{journey_datetime}/alert-list':
+      get:
+        tags:
+          - journeys
+        summary: Gets alerts/warnings details in journey
+        description: Returns the details of alerts and warnings of a concrete journey
+        operationId: get_journey_alert_list
+        parameters:
+          - name: journey_datetime
+            in: path
+            required: true
+            schema:
+              oneOf:
+                - type: string
+                  example: current
+                  enum:
+                    - current
+                    - previous
+                - type: date-time
+        responses:
+          '200':
+            description: List of alerts and warnings
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/AlertListSchema'
+          '404':
+            description: Journey not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          default:
+            description: Unexpected server response
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+        security:
+          - api_key: null
+    '/videoAnalysis/journeys/{journey_datetime}/program-list':
+      get:
+        tags:
+          - journeys
+        summary: Gets data of all programs in journey
+        description: Gets data of all programs in journey
+        operationId: get_journey_program_list
+        parameters:
+          - name: journey_datetime
+            in: path
+            required: true
+            schema:
+              oneOf:
+                - type: string
+                  example: current
+                  enum:
+                    - current
+                    - previous
+                - type: date-time
+        responses:
+          '200':
+            description: Data of programs from journey
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    schema: ProgramSchema
+          '404':
+            description: Journey not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          default:
+            description: Unexpected server response
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+        security:
+          - api_key: null
+    '/videoAnalysis/journeys/{journey_datetime}/program-name-list':
+      get:
+        tags:
+          - journeys
+        summary: Gets names of all programs in journey
+        description: Gets names of all programs in journey
+        operationId: get_journey_program_name_list
+        parameters:
+          - name: journey_datetime
+            in: path
+            required: true
+            schema:
+              oneOf:
+                - type: string
+                  example: current
+                  enum:
+                    - current
+                    - previous
+                - type: date-time
+        responses:
+          '200':
+            description: List of programs names
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    type: string
+                    description: Program name
+                    example: News
+          '404':
+            description: Journey not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          default:
+            description: Unexpected server response
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+        security:
+          - api_key: null
+    '/videoAnalysis/journeys/{journey_datetime}/{program_name}':
+      get:
+        tags:
+          - journeys
+        summary: Gets data of a concrete program in journey
+        description: Gets data of a concrete program in journey
+        operationId: get_journey_program
+        parameters:
+          - name: journey_datetime
+            in: path
+            required: true
+            schema:
+              oneOf:
+                - type: string
+                  example: current
+                  enum:
+                    - current
+                    - previous
+                - type: date-time
+          - name: program_name
+            in: path
+            required: true
+            schema:
+              type: string
+              description: Program name
+              example: News
+        responses:
+          '200':
+            description: Program from journey
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ProgramSchema'
+          '404':
+            description: Journey not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          default:
+            description: Unexpected server response
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+        security:
+          - api_key: null
+    '/videoAnalysis/programs/{program_name}/data':
+      get:
+        tags:
+          - programs
+        summary: Gets data of specific program
+        description: Gets data of specific program
+        operationId: get_program_data
+        parameters:
+          - name: program_name
+            in: path
+            required: true
+            schema:
+              type: string
+              example: news1
+        responses:
+          '200':
+            description: Program data
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ProgramData'
+          '404':
+            description: Program not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          default:
+            description: Unexpected server response
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+        security:
+          - api_key: null
+    '/videoAnalysis/programs/{program_name}/mos':
+      get:
+        tags:
+          - programs
+        summary: Gets average MOS value of specific program
+        description: Gets average MOS value of specific program
+        operationId: get_program_mos
+        parameters:
+          - name: program_name
+            in: path
+            required: true
+            schema:
+              type: string
+              example: news1
+        responses:
+          '200':
+            description: Program MOS
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/MosSchema'
+          '404':
+            description: Program not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          default:
+            description: Unexpected server response
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+        security:
+          - api_key: null
+    '/videoAnalysis/programs/{program_name}/mos-percentages':
+      get:
+        tags:
+          - programs
+        summary: Gets MOS categories of specific program
+        description: Gets MOS categories of specific program
+        operationId: get_program_mos_percentages
+        parameters:
+          - name: program_name
+            in: path
+            required: true
+            schema:
+              type: string
+              example: news1
+        responses:
+          '200':
+            description: Program MOS categories
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/MosPercentagesSchema'
+          '404':
+            description: Program not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          default:
+            description: Unexpected server response
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+        security:
+          - api_key: null
+    '/videoAnalysis/programs/{program_name}/alert-number':
+      get:
+        tags:
+          - programs
+        summary: Gets number of alerts/warnings of specific program
+        description: Gets number of alerts/warnings of specific program
+        operationId: get_program_alert_number
+        parameters:
+          - name: program_name
+            in: path
+            required: true
+            schema:
+              type: string
+              example: news1
+        responses:
+          '200':
+            description: Number of alerts in program
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/AlertNumberSchema'
+          '404':
+            description: Program not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          default:
+            description: Unexpected server response
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+        security:
+          - api_key: null
+    '/videoAnalysis/programs/{program_name}/alert-list':
+      get:
+        tags:
+          - programs
+        summary: Gets a list of alerts/warnings of specific program
+        description: Gets a list of alerts/warnings of specific program
+        operationId: get_program_alert_list
+        parameters:
+          - name: program_name
+            in: path
+            required: true
+            schema:
+              type: string
+              example: news1
+        responses:
+          '200':
+            description: List of alerts/warnings of specific program
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/AlertListSchema'
+          '404':
+            description: Program not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          default:
+            description: Unexpected server response
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+        security:
+          - api_key: null
+    /videoAnalysis/search/data:
+      post:
+        tags:
+          - search
+        summary: Returns data from a given date range or journey search
+        description: Returns data from a given date range or journey search
+        operationId: search_data
+        requestBody:
+          description: 'Data for search - Datetimes, Journey, Program and URL.'
+          required: true
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - SearchDatetimeSchema
+                  - SearchJourneySchema
+        responses:
+          '200':
+            description: Search results
+            content:
+              application/json:
+                schema:
+                  oneOf:
+                    - MosSchema
+                    - MosPercentagesSchema
+          '404':
+            description: No documents in search range
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          default:
+            description: Unexpected server response
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+        security:
+          - api_key: null
+    /videoAnalysis/search/url:
+      post:
+        tags:
+          - search
+        summary: Returns data from a given date range or journey search
+        description: Returns data from a given date range or journey search
+        operationId: search_data
+        requestBody:
+          description: 'Data for search - Datetimes, Journey, Program and URL.'
+          required: true
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - SearchDatetimeSchema
+                  - SearchJourneySchema
+        responses:
+          '200':
+            description: Url for file resulting from search process
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    url:
+                      type: string
+                      example: /files/fjoaidjfslfjkdfja43124.csv
+                      description: url of file to retrieve
+                  required:
+                    - url
+          '404':
+            description: No documents in search range
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          default:
+            description: Unexpected server response
+            content:
+              application/json: ErrorResponse
+        security:
+          - api_key: null
+    /videoAnalysis/vod/upload:
+      get:
+        tags:
+          - vod
+        summary: Uploads file to server for VOD analysis
+        description: Uploads file to server for VOD analysis
+        operationId: vod_upload
+        responses:
+          '200':
+            description: URL of uploaded file in server
+            content:
+              application/json:
+                schema:
+                  type: string
+                  example: /tmp/video1.mkv
+          '400':
+            description: File already in server
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          '404':
+            description: File not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          default:
+            description: Unexpected server response
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+        security:
+          - api_key: null
+  openapi: 3.0.0
+  components:
+    schemas:
+      ApiResponse:
+        type: object
+        properties:
+          output:
+            type: object
+          code:
+            type: integer
+            format: int32
+          task:
+            type: string
+          message:
+            type: string
+            description: Information about the operation
+      ErrorResponse:
+        type: object
+        properties:
+          output:
+            type: object
+          code:
+            type: integer
+            format: int32
+          task:
+            type: string
+          message:
+            type: string
+            description: Information about the operation
+      VideoSettings:
+        type: object
+        properties:
+          scan_type:
+            type: string
+          temp_inf_max:
+            type: number
+            format: float
+          pix_format:
+            type: string
+          spat_inf_max:
+            type: number
+            format: float
+          codec:
+            type: string
+          blurring_min:
+            type: number
+            format: float
+          spat_inf_std:
+            type: number
+            format: float
+          temp_inf_avg:
+            type: number
+            format: float
+          n_frames_metric:
+            type: integer
+            format: int32
+          pts_loop:
+            type: integer
+            format: int32
+          spat_inf_median:
+            type: number
+            format: float
+          blurring_kurtosis:
+            type: number
+            format: float
+          blurring_max:
+            type: number
+            format: float
+          video_second:
+            type: integer
+            format: int32
+          blurring_median:
+            type: number
+            format: float
+          bitrate:
+            type: number
+            format: float
+          spat_inf_min:
+            type: number
+            format: float
+          width:
+            type: integer
+            format: int32
+          frame_rate:
+            type: integer
+            format: int32
+          resolution:
+            type: string
+          spat_inf_kurtosis:
+            type: number
+            format: float
+          temp_inf_std:
+            type: number
+            format: float
+          blurring_std:
+            type: number
+            format: float
+          height:
+            type: number
+            format: float
+          duration:
+            type: number
+            format: float
+          temp_inf_kurtosis:
+            type: number
+            format: float
+          color_space:
+            type: string
+          temp_inf_skewness:
+            type: number
+            format: float
+          spat_inf_skewness:
+            type: number
+            format: float
+          pts:
+            type: integer
+            format: int32
+          blurring_skewness:
+            type: number
+            format: float
+          temp_inf_median:
+            type: number
+            format: float
+          blurring_avg:
+            type: number
+            format: float
+          temp_inf_min:
+            type: number
+            format: float
+          spat_inf_avg:
+            type: number
+            format: float
+        required:
+          - codec
+          - duration
+          - scan_type
+      MosAnalysis:
+        type: object
+        properties:
+          mos:
+            type: number
+            format: float
+          confidence_intervals:
+            type: array
+            items:
+              type: number
+              format: float
+          percentage:
+            type: string
+          strategy:
+            type: string
+        required:
+          - strategy
+      AudioSettings:
+        type: object
+        properties:
+          sample_rate:
+            type: number
+            format: float
+          channels:
+            type: number
+            format: float
+          bitrate:
+            type: number
+            format: float
+          codec:
+            type: string
+        required:
+          - bitrate
+          - channels
+          - codec
+          - sample_rate
+      VideoSRC:
+        type: object
+        properties:
+          program_name:
+            type: string
+          nb_streams:
+            type: number
+            format: float
+          service_provider:
+            type: string
+          url:
+            type: string
+          program_number:
+            type: integer
+            format: int32
+          service_name:
+            type: string
+      VideoAnalysisSchema:
+        type: object
+        properties:
+          id: {}
+          videoSettings:
+            $ref: '#/components/schemas/VideoSettings'
+          inserted_at:
+            type: integer
+            format: int32
+          journey_datetime:
+            type: string
+            format: date-time
+          mode:
+            type: string
+          timestamp:
+            type: string
+          mosAnalysis:
+            $ref: '#/components/schemas/MosAnalysis'
+          audioSettings:
+            $ref: '#/components/schemas/AudioSettings'
+          videoSRC:
+            $ref: '#/components/schemas/VideoSRC'
+        required:
+          - inserted_at
+      MosSchema:
+        type: object
+        properties:
+          mos:
+            type: number
+            format: float
+            description: Mos Value
+      MosPercentagesSchema:
+        type: object
+        properties:
+          mos_excellent:
+            type: number
+            format: float
+          mos_regular:
+            type: number
+            format: float
+          mos_poor:
+            type: number
+            format: float
+          mos_good:
+            type: number
+            format: float
+      ProgramSchema:
+        type: object
+        properties:
+          program_name:
+            type: string
+          mos:
+            type: number
+            format: float
+          id: {}
+          video_settings: {}
+          journey_datetime:
+            type: string
+            format: date-time
+          duration:
+            type: integer
+            format: int32
+          warnings:
+            type: integer
+            format: int32
+          url:
+            type: string
+          content_type:
+            type: string
+          end_datetime:
+            type: string
+            format: date-time
+          alerts:
+            type: integer
+            format: int32
+          data:
+            type: array
+            items: {}
+          mos_percentages:
+            $ref: '#/components/schemas/MosPercentagesSchema'
+          start_datetime:
+            type: string
+            format: date-time
+      Alert:
+        type: object
+        properties:
+          program_name:
+            type: string
+          mos:
+            type: number
+            format: float
+          id: {}
+          description:
+            type: string
+          journey_datetime:
+            type: string
+            format: date-time
+          duration:
+            type: integer
+            format: int32
+          category:
+            type: string
+          url:
+            type: string
+          end_datetime:
+            type: string
+            format: date-time
+          document_id: {}
+          confidence:
+            type: number
+            format: float
+          start_datetime:
+            type: string
+            format: date-time
+      Warning:
+        type: object
+        properties:
+          program_name:
+            type: string
+          mos:
+            type: number
+            format: float
+          id: {}
+          description:
+            type: string
+          journey_datetime:
+            type: string
+            format: date-time
+          duration:
+            type: integer
+            format: int32
+          category:
+            type: string
+          url:
+            type: string
+          end_datetime:
+            type: string
+            format: date-time
+          document_id: {}
+          confidence:
+            type: number
+            format: float
+          start_datetime:
+            type: string
+            format: date-time
+      AlertListSchema:
+        type: object
+        properties:
+          alerts:
+            type: array
+            items:
+              $ref: '#/components/schemas/Alert'
+          warnings:
+            type: array
+            items:
+              $ref: '#/components/schemas/Warning'
+      AlertNumberSchema:
+        type: object
+        properties:
+          alerts:
+            type: integer
+            format: int32
+            description: Number of alerts
+          warnings:
+            type: integer
+            format: int32
+            description: Number of warnings
+      ProbeConfigSchema:
+        type: object
+        properties:
+          id: {}
+          alert_mos_threshold:
+            type: number
+            format: float
+          journey_start_time:
+            type: integer
+            format: int32
+          samples:
+            type: integer
+            format: int32
+          mos_excellent:
+            type: number
+            format: float
+          mos_regular:
+            type: number
+            format: float
+          mode:
+            type: string
+          url:
+            type: string
+          mos_good:
+            type: number
+            format: float
+          channel_name:
+            type: string
+          warning_mos_threshold:
+            type: number
+            format: float
+          journey_duration:
+            type: integer
+            format: int32
+          program_duration:
+            type: integer
+            format: int32
+      SearchDatetimeSchema:
+        type: object
+        properties:
+          program_name:
+            type: string
+            description: Program name to search
+          type:
+            type: string
+            description: Type of file (CSV/JSON)
+          url:
+            type: string
+            description: URL to search
+          end_datetime:
+            type: string
+            format: date-time
+            description: End datetime to search
+          start_datetime:
+            type: string
+            format: date-time
+            description: Start datetime to search
+        required:
+          - end_datetime
+          - start_datetime
+      SearchJourneySchema:
+        type: object
+        properties:
+          program_name:
+            type: string
+            description: Program name to search
+          journey_datetime:
+            type: string
+            format: date-time
+            description: Datetime of journey to search
+          type:
+            type: string
+            description: Type of file (CSV/JSON)
+          url:
+            type: string
+            description: URL to search
+        required:
+          - journey_datetime
+      ProgramData:
+        type: object
+        properties:
+          mos:
+            type: number
+            format: float
+            description: MOS value
+          pts:
+            type: integer
+            format: int32
+            description: PTS value
+          timestamp:
+            type: string
+            description: Timestamp of measure
+  

@@ -1,0 +1,18 @@
+image: python:3.7
+
+pages:
+  stage: deploy
+  script:
+  - ./build_docs.sh
+  - mv docs/build/html/ public/
+  - mv data_manager/static/templates/api_docs_gitlab.html public/
+  - ls data_manager/static/
+  - ls public/
+  - cp data_manager/static/swagger.json public/
+  artifacts:
+    paths:
+    - public
+  only:
+  - master
+  - dev
+

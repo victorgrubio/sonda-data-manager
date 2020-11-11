@@ -1,0 +1,24 @@
+# Pycache for all folders
+__pycache__/
+
+# InteliJ Idea files
+.idea/
+
+# Logs
+app_logs/
+
+# Eclipse files
+/.project
+/.pydevproject
+
+#VSCODE files
+.vscode
+
+# Virtualenv
+venv
+
+# Build docs
+docs/build
+
+#test data
+test_data
